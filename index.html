@@ -1,31 +1,646 @@
-<!doctype html><html lang="ko"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>BLACK HOLE CLICKER</title>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<title>Cleaning Draw</title>
+
 <style>
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#03040a;color:#fff;font-family:Arial,sans-serif}
-.app{width:100%;height:100%;max-width:520px;margin:auto;position:relative;overflow:hidden;background:radial-gradient(circle at 50% 40%,#171329,#070811 48%,#020308)}
-.stars{position:absolute;inset:0;opacity:.5;background-image:radial-gradient(circle,#fff 1px,transparent 1px),radial-gradient(circle,#8ca5ff 1px,transparent 1px);background-size:73px 83px,127px 151px;background-position:10px 20px,45px 70px}
-.top{position:relative;text-align:center;padding:28px 18px 8px;z-index:2}.title{font-size:13px;letter-spacing:4px;color:#aaa7bd}.score{font-size:42px;font-weight:800;margin-top:8px;text-shadow:0 0 25px #9c7cff}.unit{font-size:11px;color:#77738d}
-.arena{position:absolute;inset:125px 0 180px;display:flex;align-items:center;justify-content:center}
-.blackhole{width:205px;height:205px;border:0;border-radius:50%;position:relative;cursor:pointer;background:radial-gradient(circle,#000 0 39%,#08070f 40% 48%,transparent 49%),conic-gradient(#ffb65b,#9e59ff,#39b9ff,#ff6caa,#ffb65b);box-shadow:0 0 28px #a45cff,0 0 75px #6330b4;animation:pulse 3s ease-in-out infinite}
-.blackhole:before{content:"";position:absolute;inset:-17px;border-radius:50%;background:conic-gradient(transparent,#ffb45d,transparent 25%,#7e5cff,transparent 55%,#ff679d,transparent 78%);filter:blur(7px);z-index:-1;animation:spin 4s linear infinite}
-.blackhole:after{content:"";position:absolute;inset:43px;border-radius:50%;background:#000;box-shadow:inset 0 0 25px #000}
-@keyframes spin{to{transform:rotate(360deg)}}@keyframes pulse{50%{transform:scale(1.035)}}
-.stats{position:absolute;bottom:115px;left:18px;right:18px;display:flex;gap:10px}.card{flex:1;background:#10111b;border:1px solid #27273a;border-radius:14px;padding:12px 4px;text-align:center}.card b{display:block;font-size:16px}.card span{font-size:9px;color:#77738d}
-.shop{position:absolute;bottom:0;left:0;right:0;padding:12px 14px 22px;background:rgba(6,7,12,.94);border-top:1px solid #222334;backdrop-filter:blur(12px)}.upgrades{display:flex;gap:8px}.btn{flex:1;border:1px solid #35354b;border-radius:12px;background:#171827;color:#fff;padding:12px 5px;font-size:11px;font-weight:700}.btn:active{transform:scale(.96);background:#29263d}.cost{display:block;color:#9f8cff;margin-top:4px;font-size:10px}.float{position:absolute;pointer-events:none;font-size:24px;font-weight:800;text-shadow:0 0 12px #a66cff;animation:float .7s ease-out forwards;z-index:5}@keyframes float{to{transform:translateY(-75px);opacity:0}}.reset{position:absolute;right:14px;top:20px;background:none;border:0;color:#66677b;font-size:11px}
-</style></head><body><div class="app"><div class="stars"></div><button class="reset" onclick="resetGame()">RESET</button>
-<div class="top"><div class="title">BLACK HOLE CLICKER</div><div class="score" id="score">0</div><div class="unit">MATTER ABSORBED</div></div>
-<div class="arena" id="arena"><button class="blackhole" id="hole"></button></div>
-<div class="stats"><div class="card"><b id="power">1</b><span>CLICK POWER</span></div><div class="card"><b id="auto">0</b><span>PER SEC</span></div><div class="card"><b id="level">1</b><span>LEVEL</span></div></div>
-<div class="shop"><div class="upgrades"><button class="btn" onclick="buyPower()">POWER<span class="cost" id="powerCost">10</span></button><button class="btn" onclick="buyAuto()">ABSORBER<span class="cost" id="autoCost">50</span></button><button class="btn" onclick="buyLevel()">SINGULARITY<span class="cost" id="levelCost">200</span></button></div></div></div>
+@import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap');
+
+:root{
+    --bg:#08090d;
+    --panel:rgba(20,22,29,.72);
+    --line:rgba(255,255,255,.09);
+    --text:#f6f7fb;
+    --muted:#8b8f9d;
+    --accent:#8b7cff;
+    --accent2:#b39cff;
+}
+
+*{
+    box-sizing:border-box;
+    -webkit-tap-highlight-color:transparent;
+}
+
+html,body{
+    margin:0;
+    min-height:100%;
+    background:var(--bg);
+    color:var(--text);
+    font-family:Pretendard,Arial,sans-serif;
+}
+
+body{
+    min-height:100dvh;
+    display:flex;
+    justify-content:center;
+    overflow-x:hidden;
+}
+
+body::before{
+    content:"";
+    position:fixed;
+    width:420px;
+    height:420px;
+    left:50%;
+    top:5%;
+    transform:translateX(-50%);
+    background:radial-gradient(circle,rgba(139,124,255,.18),transparent 68%);
+    filter:blur(35px);
+    pointer-events:none;
+}
+
+.app{
+    width:100%;
+    max-width:560px;
+    min-height:100dvh;
+    padding:22px 16px 30px;
+    position:relative;
+}
+
+.header{
+    text-align:center;
+    padding:14px 0 20px;
+}
+
+.eyebrow{
+    font-size:10px;
+    font-weight:700;
+    letter-spacing:3px;
+    color:#8c8da2;
+    text-transform:uppercase;
+}
+
+.title{
+    margin:9px 0 6px;
+    font-size:34px;
+    font-weight:800;
+    letter-spacing:-1.8px;
+}
+
+.subtitle{
+    color:var(--muted);
+    font-size:12px;
+}
+
+.card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:24px;
+    padding:18px;
+    margin-top:12px;
+    box-shadow:
+        0 20px 50px rgba(0,0,0,.25),
+        inset 0 1px rgba(255,255,255,.025);
+    backdrop-filter:blur(22px);
+}
+
+.section-title{
+    font-size:12px;
+    font-weight:700;
+    color:#a9adbb;
+    margin-bottom:10px;
+}
+
+textarea{
+    width:100%;
+    height:128px;
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:16px;
+    resize:none;
+    outline:none;
+    padding:14px;
+    background:rgba(255,255,255,.035);
+    color:#fff;
+    font-family:inherit;
+    font-size:14px;
+    line-height:1.65;
+    transition:.2s;
+}
+
+textarea:focus{
+    border-color:rgba(139,124,255,.6);
+    background:rgba(255,255,255,.05);
+    box-shadow:0 0 0 4px rgba(139,124,255,.08);
+}
+
+.controls{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:9px;
+    margin-top:10px;
+}
+
+button{
+    font-family:inherit;
+    cursor:pointer;
+    border:0;
+}
+
+.main-btn{
+    grid-column:1/-1;
+    height:54px;
+    border-radius:16px;
+    color:white;
+    font-size:15px;
+    font-weight:800;
+    background:linear-gradient(135deg,#8b7cff,#6254dc);
+    box-shadow:
+        0 12px 28px rgba(116,95,255,.25),
+        inset 0 1px rgba(255,255,255,.2);
+    transition:.16s;
+}
+
+.main-btn:active{
+    transform:scale(.985);
+}
+
+.main-btn:disabled{
+    opacity:.55;
+}
+
+.sub-btn{
+    height:44px;
+    border-radius:14px;
+    background:rgba(255,255,255,.045);
+    border:1px solid rgba(255,255,255,.07);
+    color:#c4c7d2;
+    font-size:12px;
+    font-weight:700;
+}
+
+.sub-btn:active{
+    background:rgba(255,255,255,.08);
+}
+
+.error{
+    min-height:16px;
+    margin-top:9px;
+    text-align:center;
+    color:#ff8798;
+    font-size:11px;
+}
+
+.stage{
+    padding:17px;
+}
+
+.stage-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:13px;
+}
+
+.stage-label{
+    font-size:11px;
+    color:#8f93a1;
+    font-weight:700;
+    letter-spacing:1px;
+}
+
+.stage-count{
+    font-size:10px;
+    color:#737887;
+}
+
+.board{
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:8px;
+}
+
+.slot{
+    aspect-ratio:1/1.12;
+    border-radius:17px;
+    position:relative;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    background:
+        linear-gradient(160deg,rgba(255,255,255,.055),rgba(255,255,255,.02));
+    border:1px solid rgba(255,255,255,.08);
+    box-shadow:inset 0 1px rgba(255,255,255,.025);
+}
+
+.slot-number{
+    position:absolute;
+    top:8px;
+    left:9px;
+    font-size:8px;
+    font-weight:700;
+    color:#626675;
+    letter-spacing:1px;
+}
+
+.slot-name{
+    font-size:12px;
+    font-weight:800;
+    color:#666a78;
+    text-align:center;
+    padding:5px;
+    word-break:keep-all;
+}
+
+.slot.active{
+    border-color:rgba(139,124,255,.7);
+    background:
+        radial-gradient(circle at 50% 20%,rgba(139,124,255,.2),transparent 65%),
+        linear-gradient(160deg,rgba(255,255,255,.08),rgba(255,255,255,.025));
+}
+
+.slot.active .slot-name{
+    color:#fff;
+    text-shadow:0 0 18px rgba(179,156,255,.5);
+}
+
+.slot.winner{
+    border-color:rgba(179,156,255,.8);
+    background:
+        radial-gradient(circle at 50% 0%,rgba(179,156,255,.22),transparent 65%),
+        linear-gradient(160deg,rgba(139,124,255,.12),rgba(255,255,255,.03));
+    box-shadow:
+        0 0 0 1px rgba(139,124,255,.12),
+        0 0 30px rgba(139,124,255,.15),
+        inset 0 1px rgba(255,255,255,.06);
+}
+
+.result{
+    overflow:hidden;
+    display:none;
+}
+
+.result.show{
+    display:block;
+    animation:resultIn .45s cubic-bezier(.2,.8,.2,1);
+}
+
+@keyframes resultIn{
+    from{
+        opacity:0;
+        transform:translateY(10px);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+.result-header{
+    text-align:center;
+    margin-bottom:14px;
+}
+
+.result-label{
+    font-size:9px;
+    letter-spacing:2.5px;
+    color:#85899a;
+    font-weight:800;
+}
+
+.result-title{
+    margin-top:5px;
+    font-size:19px;
+    font-weight:800;
+}
+
+.winners{
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:7px;
+}
+
+.winner{
+    min-height:68px;
+    border-radius:15px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:8px 4px;
+    font-size:11px;
+    font-weight:800;
+    background:
+        linear-gradient(145deg,rgba(139,124,255,.18),rgba(255,255,255,.035));
+    border:1px solid rgba(139,124,255,.25);
+    box-shadow:inset 0 1px rgba(255,255,255,.04);
+    animation:winnerPop .4s backwards;
+}
+
+@keyframes winnerPop{
+    from{
+        opacity:0;
+        transform:scale(.7) translateY(8px);
+    }
+    to{
+        opacity:1;
+        transform:scale(1) translateY(0);
+    }
+}
+
+.status{
+    text-align:center;
+    margin-top:12px;
+    color:#777c8d;
+    font-size:10px;
+}
+
+.rolling{
+    animation:rolling .11s linear infinite;
+}
+
+@keyframes rolling{
+    0%{transform:translateY(-2px)}
+    50%{transform:translateY(2px)}
+    100%{transform:translateY(-2px)}
+}
+
+.pop{
+    animation:pop .35s cubic-bezier(.2,.8,.2,1);
+}
+
+@keyframes pop{
+    0%{
+        opacity:0;
+        transform:scale(.65);
+    }
+    65%{
+        transform:scale(1.08);
+    }
+    100%{
+        opacity:1;
+        transform:scale(1);
+    }
+}
+
+.footer{
+    text-align:center;
+    color:#565a68;
+    font-size:9px;
+    margin-top:17px;
+    letter-spacing:.4px;
+}
+
+@media(max-width:390px){
+    .app{padding-left:12px;padding-right:12px}
+    .title{font-size:29px}
+    .card{border-radius:20px;padding:14px}
+    .board{gap:6px}
+    .slot{border-radius:14px}
+    .slot-name{font-size:10px}
+    .winner{font-size:10px}
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <header class="header">
+        <div class="eyebrow">CLASSROOM RANDOMIZER</div>
+        <div class="title">청소당번 뽑기</div>
+        <div class="subtitle">오늘의 청소당번 5명을 랜덤으로 선정합니다.</div>
+    </header>
+
+    <section class="card">
+        <div class="section-title">STUDENTS</div>
+
+        <textarea
+            id="names"
+            placeholder="학생 이름을 한 줄에 한 명씩 입력해주세요.&#10;&#10;김민수&#10;이서연&#10;박지훈&#10;최유진&#10;정우진"
+        ></textarea>
+
+        <div class="controls">
+            <button class="main-btn" id="drawBtn" onclick="startDraw()">
+                5명 뽑기
+            </button>
+
+            <button class="sub-btn" onclick="exampleNames()">
+                예시 입력
+            </button>
+
+            <button class="sub-btn" onclick="resetGame()">
+                초기화
+            </button>
+        </div>
+
+        <div class="error" id="error"></div>
+    </section>
+
+    <section class="card stage">
+
+        <div class="stage-head">
+            <div class="stage-label">DRAW BOARD</div>
+            <div class="stage-count">5 SELECTED</div>
+        </div>
+
+        <div class="board" id="board"></div>
+
+        <div class="status" id="status">
+            이름을 입력하고 뽑기를 시작하세요.
+        </div>
+
+    </section>
+
+    <section class="card result" id="result">
+
+        <div class="result-header">
+            <div class="result-label">TODAY'S CLEANING CREW</div>
+            <div class="result-title">오늘의 청소당번</div>
+        </div>
+
+        <div class="winners" id="winners"></div>
+
+    </section>
+
+    <div class="footer">
+        RANDOM • FAIR • SIMPLE
+    </div>
+
+</div>
+
 <script>
-let score=+(localStorage.bhScore||0),power=+(localStorage.bhPower||1),auto=+(localStorage.bhAuto||0),level=+(localStorage.bhLevel||1),powerCost=10,autoCost=50,levelCost=200;
-const $=id=>document.getElementById(id);function save(){localStorage.bhScore=score;localStorage.bhPower=power;localStorage.bhAuto=auto;localStorage.bhLevel=level}
-function render(){$("score").textContent=Math.floor(score).toLocaleString();$("power").textContent=power;$("auto").textContent=auto;$("level").textContent=level;$("powerCost").textContent=powerCost;$("autoCost").textContent=autoCost;$("levelCost").textContent=levelCost}
-$("hole").addEventListener("pointerdown",e=>{score+=power;let a=$("arena").getBoundingClientRect(),f=document.createElement("div");f.className="float";f.textContent="+"+power;f.style.left=(e.clientX-a.left)+"px";f.style.top=(e.clientY-a.top)+"px";$("arena").appendChild(f);setTimeout(()=>f.remove(),700);render();save()});
-function buyPower(){if(score>=powerCost){score-=powerCost;power++;powerCost=Math.ceil(powerCost*1.65);render();save()}}
-function buyAuto(){if(score>=autoCost){score-=autoCost;auto++;autoCost=Math.ceil(autoCost*1.8);render();save()}}
-function buyLevel(){if(score>=levelCost){score-=levelCost;level++;power+=level;levelCost=Math.ceil(levelCost*2.2);render();save()}}
-function resetGame(){if(confirm("처음부터 다시 시작할까요?")){score=0;power=1;auto=0;level=1;powerCost=10;autoCost=50;levelCost=200;save();render()}}
-setInterval(()=>{if(auto){score+=auto;render();save()}},1000);render();
-</script></body></html>
+let drawing = false;
+
+const namesInput = document.getElementById("names");
+const board = document.getElementById("board");
+const result = document.getElementById("result");
+const winners = document.getElementById("winners");
+const statusText = document.getElementById("status");
+const error = document.getElementById("error");
+const drawBtn = document.getElementById("drawBtn");
+
+function getNames(){
+    return namesInput.value
+        .split(/[\n,]+/)
+        .map(name => name.trim())
+        .filter(Boolean);
+}
+
+function shuffle(array){
+    const arr = [...array];
+
+    for(let i = arr.length - 1; i > 0; i--){
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+
+    return arr;
+}
+
+function createBoard(){
+    board.innerHTML = "";
+
+    for(let i = 0; i < 5; i++){
+        const slot = document.createElement("div");
+
+        slot.className = "slot";
+
+        slot.innerHTML = `
+            <div class="slot-number">0${i + 1}</div>
+            <div class="slot-name">?</div>
+        `;
+
+        board.appendChild(slot);
+    }
+}
+
+function startDraw(){
+
+    if(drawing) return;
+
+    error.textContent = "";
+
+    const names = [...new Set(getNames())];
+
+    if(names.length < 5){
+        error.textContent = "최소 5명의 이름을 입력해주세요.";
+        return;
+    }
+
+    drawing = true;
+
+    result.classList.remove("show");
+
+    drawBtn.disabled = true;
+    drawBtn.textContent = "추첨 중...";
+
+    const slots = [...document.querySelectorAll(".slot")];
+
+    slots.forEach(slot => {
+        slot.classList.remove("active","winner","pop");
+        slot.classList.add("rolling");
+        slot.querySelector(".slot-name").textContent = "???";
+    });
+
+    statusText.textContent = "오늘의 청소당번을 선정하고 있습니다.";
+
+    const selected = shuffle(names).slice(0,5);
+
+    let index = 0;
+
+    const timer = setInterval(() => {
+
+        if(index >= 5){
+
+            clearInterval(timer);
+
+            finishDraw(selected);
+
+            return;
+        }
+
+        const slot = slots[index];
+
+        slot.classList.remove("rolling");
+        slot.classList.add("active","winner","pop");
+
+        slot.querySelector(".slot-name").textContent = selected[index];
+
+        index++;
+
+    },650);
+}
+
+function finishDraw(selected){
+
+    drawing = false;
+
+    drawBtn.disabled = false;
+    drawBtn.textContent = "다시 뽑기";
+
+    statusText.textContent = "추첨 완료 · 오늘의 청소당번 5명이 선정되었습니다.";
+
+    winners.innerHTML = "";
+
+    selected.forEach((name,index) => {
+
+        const item = document.createElement("div");
+
+        item.className = "winner";
+        item.textContent = name;
+        item.style.animationDelay = `${index * 70}ms`;
+
+        winners.appendChild(item);
+    });
+
+    result.classList.add("show");
+}
+
+function exampleNames(){
+
+    if(drawing) return;
+
+    const names = [
+        "김민수",
+        "이서연",
+        "박지훈",
+        "최유진",
+        "정우진",
+        "한지민",
+        "오준호",
+        "윤서현",
+        "강민재",
+        "장예은",
+        "이도현",
+        "최서윤",
+        "박건우",
+        "정하은",
+        "김도윤"
+    ];
+
+    namesInput.value = names.join("\n");
+
+    error.textContent = "";
+
+    statusText.textContent = "15명의 예시 학생이 입력되었습니다.";
+}
+
+function resetGame(){
+
+    if(drawing) return;
+
+    namesInput.value = "";
+
+    error.textContent = "";
+
+    result.classList.remove("show");
+
+    drawBtn.disabled = false;
+    drawBtn.textContent = "5명 뽑기";
+
+    statusText.textContent = "이름을 입력하고 뽑기를 시작하세요.";
+
+    createBoard();
+}
+
+createBoard();
+</script>
+
+</body>
+</html>
