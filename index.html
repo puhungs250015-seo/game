@@ -1,0 +1,31 @@
+<!doctype html><html lang="ko"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>BLACK HOLE CLICKER</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#03040a;color:#fff;font-family:Arial,sans-serif}
+.app{width:100%;height:100%;max-width:520px;margin:auto;position:relative;overflow:hidden;background:radial-gradient(circle at 50% 40%,#171329,#070811 48%,#020308)}
+.stars{position:absolute;inset:0;opacity:.5;background-image:radial-gradient(circle,#fff 1px,transparent 1px),radial-gradient(circle,#8ca5ff 1px,transparent 1px);background-size:73px 83px,127px 151px;background-position:10px 20px,45px 70px}
+.top{position:relative;text-align:center;padding:28px 18px 8px;z-index:2}.title{font-size:13px;letter-spacing:4px;color:#aaa7bd}.score{font-size:42px;font-weight:800;margin-top:8px;text-shadow:0 0 25px #9c7cff}.unit{font-size:11px;color:#77738d}
+.arena{position:absolute;inset:125px 0 180px;display:flex;align-items:center;justify-content:center}
+.blackhole{width:205px;height:205px;border:0;border-radius:50%;position:relative;cursor:pointer;background:radial-gradient(circle,#000 0 39%,#08070f 40% 48%,transparent 49%),conic-gradient(#ffb65b,#9e59ff,#39b9ff,#ff6caa,#ffb65b);box-shadow:0 0 28px #a45cff,0 0 75px #6330b4;animation:pulse 3s ease-in-out infinite}
+.blackhole:before{content:"";position:absolute;inset:-17px;border-radius:50%;background:conic-gradient(transparent,#ffb45d,transparent 25%,#7e5cff,transparent 55%,#ff679d,transparent 78%);filter:blur(7px);z-index:-1;animation:spin 4s linear infinite}
+.blackhole:after{content:"";position:absolute;inset:43px;border-radius:50%;background:#000;box-shadow:inset 0 0 25px #000}
+@keyframes spin{to{transform:rotate(360deg)}}@keyframes pulse{50%{transform:scale(1.035)}}
+.stats{position:absolute;bottom:115px;left:18px;right:18px;display:flex;gap:10px}.card{flex:1;background:#10111b;border:1px solid #27273a;border-radius:14px;padding:12px 4px;text-align:center}.card b{display:block;font-size:16px}.card span{font-size:9px;color:#77738d}
+.shop{position:absolute;bottom:0;left:0;right:0;padding:12px 14px 22px;background:rgba(6,7,12,.94);border-top:1px solid #222334;backdrop-filter:blur(12px)}.upgrades{display:flex;gap:8px}.btn{flex:1;border:1px solid #35354b;border-radius:12px;background:#171827;color:#fff;padding:12px 5px;font-size:11px;font-weight:700}.btn:active{transform:scale(.96);background:#29263d}.cost{display:block;color:#9f8cff;margin-top:4px;font-size:10px}.float{position:absolute;pointer-events:none;font-size:24px;font-weight:800;text-shadow:0 0 12px #a66cff;animation:float .7s ease-out forwards;z-index:5}@keyframes float{to{transform:translateY(-75px);opacity:0}}.reset{position:absolute;right:14px;top:20px;background:none;border:0;color:#66677b;font-size:11px}
+</style></head><body><div class="app"><div class="stars"></div><button class="reset" onclick="resetGame()">RESET</button>
+<div class="top"><div class="title">BLACK HOLE CLICKER</div><div class="score" id="score">0</div><div class="unit">MATTER ABSORBED</div></div>
+<div class="arena" id="arena"><button class="blackhole" id="hole"></button></div>
+<div class="stats"><div class="card"><b id="power">1</b><span>CLICK POWER</span></div><div class="card"><b id="auto">0</b><span>PER SEC</span></div><div class="card"><b id="level">1</b><span>LEVEL</span></div></div>
+<div class="shop"><div class="upgrades"><button class="btn" onclick="buyPower()">POWER<span class="cost" id="powerCost">10</span></button><button class="btn" onclick="buyAuto()">ABSORBER<span class="cost" id="autoCost">50</span></button><button class="btn" onclick="buyLevel()">SINGULARITY<span class="cost" id="levelCost">200</span></button></div></div></div>
+<script>
+let score=+(localStorage.bhScore||0),power=+(localStorage.bhPower||1),auto=+(localStorage.bhAuto||0),level=+(localStorage.bhLevel||1),powerCost=10,autoCost=50,levelCost=200;
+const $=id=>document.getElementById(id);function save(){localStorage.bhScore=score;localStorage.bhPower=power;localStorage.bhAuto=auto;localStorage.bhLevel=level}
+function render(){$("score").textContent=Math.floor(score).toLocaleString();$("power").textContent=power;$("auto").textContent=auto;$("level").textContent=level;$("powerCost").textContent=powerCost;$("autoCost").textContent=autoCost;$("levelCost").textContent=levelCost}
+$("hole").addEventListener("pointerdown",e=>{score+=power;let a=$("arena").getBoundingClientRect(),f=document.createElement("div");f.className="float";f.textContent="+"+power;f.style.left=(e.clientX-a.left)+"px";f.style.top=(e.clientY-a.top)+"px";$("arena").appendChild(f);setTimeout(()=>f.remove(),700);render();save()});
+function buyPower(){if(score>=powerCost){score-=powerCost;power++;powerCost=Math.ceil(powerCost*1.65);render();save()}}
+function buyAuto(){if(score>=autoCost){score-=autoCost;auto++;autoCost=Math.ceil(autoCost*1.8);render();save()}}
+function buyLevel(){if(score>=levelCost){score-=levelCost;level++;power+=level;levelCost=Math.ceil(levelCost*2.2);render();save()}}
+function resetGame(){if(confirm("처음부터 다시 시작할까요?")){score=0;power=1;auto=0;level=1;powerCost=10;autoCost=50;levelCost=200;save();render()}}
+setInterval(()=>{if(auto){score+=auto;render();save()}},1000);render();
+</script></body></html>
